@@ -6,7 +6,7 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
 # variables
-template_file_path = '/home/rokatyy/labs/lab1/template.tbl'
+template_file_path = '/home/rokatyy/labs/lab1/template.tbl'  
 controlled_path = '/home/rokatyy/labs/lab1/'
 
 class Controller:
@@ -15,8 +15,8 @@ class Controller:
 
         self.TEMPLATE_FILE = template_file_path
         data = self._read_template_file()
-        self.forbitten_names = list(data.names)
-        self.forbitten_extensions = tuple(['.{}'.format(extension) for extension in list(data.extensions)])
+        self.forbidden_names = list(data.names)
+        self.forbiden_extensions = tuple(['.{}'.format(extension) for extension in list(data.extensions)])
 
     def _read_template_file(self):
     	"""
@@ -62,7 +62,7 @@ class Controller:
         Args: 
             name (str) - just filename. Be aware that there are shouln't be directory path inside.
         """
-        if name in self.forbitten_names  or name.endswith(self.forbitten_extensions):
+        if name in self.forbidden_names  or name.endswith(self.forbidden_extensions):
             os.system('rm -rf {file}'.format(file = name))
 
 
