@@ -14,11 +14,11 @@ class Controller:
     def __init__(self):
 
         self.TEMPLATE_FILE = template_file_path
-        data = self.read_template_file()
+        data = self._read_template_file()
         self.forbitten_names = list(data.names)
         self.forbitten_extensions = tuple(['.{}'.format(extension) for extension in list(data.extensions)])
 
-    def read_template_file(self):
+    def _read_template_file(self):
     	"""
     	Reads template file
     	if not exists, returns exception
@@ -32,16 +32,36 @@ class Controller:
 
     @staticmethod
     def __parse_full_path(path):
-        return path[:path.rfind('/')+1],path[path.rfind('/')+1:]
- 
+        """
+        Parses file path and returns dir and file separately 
+        Args:
+            path (str) - full file path
+        Return:
+            dir (str) - file directory
+            name (str) - file name
+        """
+        dir = path[:path.rfind('/')+1]
+        name = path[path.rfind('/')+1:]
+        return dir, name
+
     def check_is_event_valid(self, event):
-        """"""
-        if event.src_path == template_file_path: pass
+        """
+        Checks filename which active in event. In case of any forbitten option file will be deleted.
+        Args: 
+            event (FileSystemEventHandler object) - current system event
+
+        """
+        #TBD if event.src_path == template_file_path: 
         path, name = self.__parse_full_path(event.src_path)
         if path.find(controlled_path) >= 0 :
-            self.check_is_name_valid(name)
+            self._check_is_name_valid(name)
 
-    def check_is_name_valid(self, name):
+    def _check_is_name_valid(self, name):
+        """
+        Checks if name allowed
+        Args: 
+            name (str) - just filename. Be aware that there are shouln't be directory path inside.
+        """
         if name in self.forbitten_names  or name.endswith(self.forbitten_extensions):
             os.system('rm -rf {file}'.format(file = name))
 
