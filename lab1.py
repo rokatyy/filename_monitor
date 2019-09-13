@@ -16,6 +16,7 @@ class Controller:
         self.TEMPLATE_FILE = template_file_path
         data = self.read_template_file()
         self.forbitten_names = list(data.names)
+        self.forbitten_extensions = tuple(['.{}'.format(extension) for extension in list(data.extensions)])
 
     def read_template_file(self):
     	"""
@@ -23,7 +24,7 @@ class Controller:
     	if not exists, returns exception
     	"""
     	try:
-    		return pd.read_csv(self.TEMPLATE_FILE)
+    		return pd.read_csv(self.TEMPLATE_FILE,)
     	except FileNotFoundError:
     		sys.stdout.write("Template-file does not exist.\n")
     	except OSError as e:
@@ -35,12 +36,13 @@ class Controller:
  
     def check_is_event_valid(self, event):
         """"""
+        if event.src_path == template_file_path: pass
         path, name = self.__parse_full_path(event.src_path)
         if path.find(controlled_path) >= 0 :
             self.check_is_name_valid(name)
 
     def check_is_name_valid(self, name):
-        if name in self.forbitten_names:
+        if name in self.forbitten_names  or name.endswith(self.forbitten_extensions):
             os.system('rm -rf {file}'.format(file = name))
 
 
