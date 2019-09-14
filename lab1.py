@@ -2,6 +2,8 @@
 import pandas as pd
 import os, sys
 import time
+import re
+import json
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
@@ -14,17 +16,18 @@ class Controller:
     def __init__(self):
         self.TEMPLATE_FILE = template_file_path
         data = self._read_template_file()
-        self.forbidden_names = list(data.names)
+        self.forbidden_names = data["names"]
         self.forbidden_extensions = tuple(
-            ['.{}'.format(extension) for extension in list(data.extensions)])
+            ['.{}'.format(extension) for extension in data["extensions"]])
+        self.forbidden_regex = data["regex"]
 
     def _read_template_file(self):
-        """
+        """G
         Reads template file
         if not exists, returns exception
         """
         try:
-            return pd.read_csv(self.TEMPLATE_FILE, )
+            return json.loads(open(self.TEMPLATE_FILE,'r').read())
         except FileNotFoundError:
             sys.stdout.write("Template-file does not exist.\n")
         except OSError as e:
@@ -60,10 +63,18 @@ class Controller:
         for path in [event.src_path, event.dest_path]:
             if path is not None:
                 dir, name = self.__parse_full_path(path)
-                if dir.find(controlled_path) >= 0 and not self._check_is_name_valid(name):
-                    if path == event.dest_path: os.system('cp {dest} {src}'.format(dest = event.dest_path, src = event.src_path))
-                    os.system('rm -rf {dir}{name}'.format(dir = dir, name=name))
+                if dir.find(controlled_path
+                            ) >= 0 and not self._check_is_name_valid(name):
+                    if path == event.dest_path:
+                        os.system('cp {dest} {src}'.format(
+                            dest=event.dest_path, src=event.src_path))
+                    os.system('rm -rf {dir}{name}'.format(dir=dir, name=name))
 
+    def __check_is_match_regex(self, name):
+        for regex in self.forbidden_regex:
+            if re.match(regex, name):
+                return True
+        return False
 
     def _check_is_name_valid(self, name):
         """
@@ -72,10 +83,10 @@ class Controller:
             name (str) - just filename. Be aware that there are shouln't be directory path inside.
         """
         if name in self.forbidden_names or name.endswith(
-                self.forbidden_extensions):
+                self.forbidden_extensions) or self.__check_is_match_regex(name):
             return False
         return True
-            #os.system('rm -rf {file}'.format(file=name))
+        #os.system('rm -rf {file}'.format(file=name))
 
 
 class Watcher:
