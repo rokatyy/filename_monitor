@@ -55,9 +55,13 @@ class Controller:
         """
         if event.src_path == template_file_path:
             self.__init__()
-        path, name = self.__parse_full_path(event.src_path)
-        if path.find(controlled_path) >= 0:
-            self._check_is_name_valid(name)
+        if not hasattr(event, 'dest_path'):
+            event.dest_path = None
+        for path in [event.src_path, event.dest_path]: 
+            if path is not None:
+                dir, name = self.__parse_full_path(path)
+                if dir.find(controlled_path) >= 0:
+                    self._check_is_name_valid(name)
 
     def _check_is_name_valid(self, name):
         """
