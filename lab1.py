@@ -86,7 +86,6 @@ class Controller:
                 self.forbidden_extensions) or self.__check_is_match_regex(name):
             return False
         return True
-        #os.system('rm -rf {file}'.format(file=name))
 
 
 class Watcher:
