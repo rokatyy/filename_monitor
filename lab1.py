@@ -57,7 +57,7 @@ class Controller:
             self.__init__()
         if not hasattr(event, 'dest_path'):
             event.dest_path = None
-        for path in [event.src_path, event.dest_path]: 
+        for path in [event.src_path, event.dest_path]:
             if path is not None:
                 dir, name = self.__parse_full_path(path)
                 if dir.find(controlled_path) >= 0:
