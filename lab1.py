@@ -60,8 +60,10 @@ class Controller:
         for path in [event.src_path, event.dest_path]:
             if path is not None:
                 dir, name = self.__parse_full_path(path)
-                if dir.find(controlled_path) >= 0:
-                    self._check_is_name_valid(name)
+                if dir.find(controlled_path) >= 0 and not self._check_is_name_valid(name):
+                    if path == event.dest_path: os.system('cp {dest} {src}'.format(dest = event.dest_path, src = event.src_path))
+                    os.system('rm -rf {dir}{name}'.format(dir = dir, name=name))
+
 
     def _check_is_name_valid(self, name):
         """
@@ -71,7 +73,9 @@ class Controller:
         """
         if name in self.forbidden_names or name.endswith(
                 self.forbidden_extensions):
-            os.system('rm -rf {file}'.format(file=name))
+            return False
+        return True
+            #os.system('rm -rf {file}'.format(file=name))
 
 
 class Watcher:
