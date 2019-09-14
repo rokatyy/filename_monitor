@@ -8,8 +8,8 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 
 # variables
-template_file_path = '/home/rokatyy/labs/lab1/template.tbl'
-controlled_path = '/home/rokatyy/labs/lab1/'
+template_file_path = '~/labs/lab1/template.json'
+controlled_path = '~/labs/lab1/'
 
 
 class Controller:
