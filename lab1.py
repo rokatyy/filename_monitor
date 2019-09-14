@@ -16,7 +16,7 @@ class Controller:
         self.TEMPLATE_FILE = template_file_path
         data = self._read_template_file()
         self.forbidden_names = list(data.names)
-        self.forbiden_extensions = tuple(['.{}'.format(extension) for extension in list(data.extensions)])
+        self.forbidden_extensions = tuple(['.{}'.format(extension) for extension in list(data.extensions)])
 
     def _read_template_file(self):
     	"""
@@ -51,7 +51,8 @@ class Controller:
             event (FileSystemEventHandler object) - current system event
 
         """
-        #TBD if event.src_path == template_file_path: 
+        if event.src_path == template_file_path: 
+            self.__init__()
         path, name = self.__parse_full_path(event.src_path)
         if path.find(controlled_path) >= 0 :
             self._check_is_name_valid(name)
@@ -71,10 +72,10 @@ class Watcher:
 
     def __init__(self):
         self.observer = Observer()
+        self.event_handler = EventHandler()
 
     def run(self):
-        event_handler = EventHandler()
-        self.observer.schedule(event_handler, self.WATCH_DIR, recursive=True)
+        self.observer.schedule(self.event_handler, self.WATCH_DIR, recursive=True)
         self.observer.start()
         try:
             while True:
@@ -86,12 +87,17 @@ class Watcher:
         self.observer.join()
 
 
+
 class EventHandler(FileSystemEventHandler):
-    controller = Controller()
+    def __init__(self):
+        self.controller = Controller()
 
     def on_any_event(self,event):
         self.controller.check_is_event_valid(event)
 
-if __name__ == '__main__':
+def main():
     w = Watcher()
     w.run()
+
+if __name__ == '__main__':
+    main()
